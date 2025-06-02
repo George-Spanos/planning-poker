@@ -55,12 +55,13 @@ type RoundStartedEvent struct {
 	Event
 }
 
+// Fixed Broadcast function - defer is now outside the loop
 func Broadcast[T Broadcastable](event T, connections ...*user.Connection) {
 	for _, connection := range connections {
 		connection.Mu.Lock()
-		defer connection.Mu.Unlock()
 		if err := connection.WriteJSON(event); err != nil {
 			log.Println(err)
 		}
+		connection.Mu.Unlock()
 	}
 }

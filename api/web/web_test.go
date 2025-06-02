@@ -143,17 +143,16 @@ func TestConnectVoter(t *testing.T) {
 		{
 
 			room, _ := room.Get(roomId)
-			room.Mu.Lock()
-			if len(room.Voters) != 1 {
-				t.Fatal("\t\tRoom should have one voter. Expected length of 1. Got: ", len(room.Voters))
+			voterCount := room.GetVoterCount()
+			if voterCount != 1 {
+				t.Fatal("\t\tRoom should have one voter. Expected length of 1. Got: ", voterCount)
 			}
 			t.Log("\t\tRoom should have one voter")
 
-			if room.Voters[0].Username != username {
-				t.Fatal("\t\tUser should be added to the room. Expected username: ", username, "Got: ", room.Voters[0].Username)
+			if !room.IncludeUsername(username) {
+				t.Fatal("\t\tUser should be added to the room. Expected username: ", username)
 			}
 			t.Logf("\t\tUser named %v should be added to the room", username)
-			room.Mu.Unlock()
 		}
 	}
 
@@ -212,11 +211,9 @@ func TestUserVotes(t *testing.T) {
 		t.Log("\t After all users have voted")
 		{
 			room, _ := room.Get(string(roomId))
-			room.Mu.RLock()
-			if room.CurrentRound.Revealed {
-				t.Fatal("\t\tCurrent round should not be revealed. Expected: ", false, "Got: ", room.CurrentRound.Revealed)
+			if room.CurrentRound.IsRevealed() {
+				t.Fatal("\t\tCurrent round should not be revealed. Expected: ", false, "Got: ", room.CurrentRound.IsRevealed())
 			}
-			room.Mu.RUnlock()
 			t.Log("\t\tCurrent round should not be revealed")
 		}
 	}
@@ -262,7 +259,8 @@ func TestToRevealRound(t *testing.T) {
 			UserVotesOnRoom(t, connection, string(roomId), usename, 3)
 			UserVotesOnRoom(t, connection2, string(roomId), username2, 3)
 			room, _ := room.Get(string(roomId))
-			if !room.CurrentRound.IsRevealable(len(room.Voters)) {
+			voterCount := room.GetVoterCount()
+			if !room.CurrentRound.IsRevealable(voterCount) {
 				t.Errorf("\tRound should be revealable")
 			}
 			t.Log("\t\t When a user tries to reveal a round")
@@ -294,7 +292,7 @@ func TestToRevealRound(t *testing.T) {
 			}
 			t.Log("\t\t Before a round is revealed")
 			{
-				if room.CurrentRound.Revealed {
+				if room.CurrentRound.IsRevealed() {
 					t.Error("\t\t\tRound should not be revealed")
 				}
 				t.Log("\t\t\tRound should not be revealed")
@@ -306,7 +304,7 @@ func TestToRevealRound(t *testing.T) {
 			}
 			t.Log("\t\t After a round is revealed")
 			{
-				if !room.CurrentRound.Revealed {
+				if !room.CurrentRound.IsRevealed() {
 					t.Error("\t\t\tRound should be revealed")
 				}
 				t.Log("\t\t\tRound should be revealed")
@@ -333,8 +331,9 @@ func TestRoundReveal(t *testing.T) {
 		room, _ := room.Get(string(roomId))
 		{
 			{
-				if !room.CurrentRound.IsRevealable(len(room.Voters)) {
-					t.Fatal("\t\tRound should be revealable. Expected round to be revealable. Got: ", room.CurrentRound.IsRevealable(len(room.Voters)))
+				voterCount := room.GetVoterCount()
+			if !room.CurrentRound.IsRevealable(voterCount) {
+					t.Fatal("\t\tRound should be revealable. Expected round to be revealable. Got: ", room.CurrentRound.IsRevealable(voterCount))
 				}
 				t.Log("\tRound should be revealable")
 

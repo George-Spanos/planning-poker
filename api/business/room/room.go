@@ -1,4 +1,5 @@
 // A room represents the place in which many users gather to plan a set of tasks/stories
+// This implementation uses sync.Map for thread-safe concurrent access to rooms and users
 package room
 
 import (
@@ -15,78 +16,94 @@ import (
 )
 
 const (
-
-	// Time allowed to read the next pong message from the peer.
-	pongWait = 5 * time.Minute
-
-	// Maximum message size allowed from peer.
+	pongWait       = 5 * time.Minute
 	maxMessageSize = 512
 )
 
 type Room struct {
 	Id           string
-	Voters       []*user.Connection
-	Spectators   []*user.Connection
+	Voters       sync.Map // username -> *user.Connection
+	Spectators   sync.Map // username -> *user.Connection
 	CurrentRound *Round
 	cancelReveal chan bool
-	Mu           sync.RWMutex
+	cancelMu     sync.RWMutex // Just for cancelReveal channel
 }
 
-var rooms = make(map[string]*Room)
+// Using sync.Map for thread-safe global rooms storage
+var rooms sync.Map
+
+// GetVoterCount returns the number of voters in the room
+func (room *Room) GetVoterCount() int {
+	count := 0
+	room.Voters.Range(func(key, value interface{}) bool {
+		count++
+		return true
+	})
+	return count
+}
 
 func (room *Room) convertSpectatorToVoter(username string) {
-	for i, spectator := range room.Spectators {
-		if spectator.Username == username {
-			room.Spectators = append(room.Spectators[:i], room.Spectators[i+1:]...)
-			room.Voters = append(room.Voters, spectator)
-			break
-		}
+	if value, loaded := room.Spectators.LoadAndDelete(username); loaded {
+		spectator := value.(*user.Connection)
+		room.Voters.Store(username, spectator)
 	}
 }
+
 func (room *Room) convertVoterToSpectator(username string) {
-	for i, voter := range room.Voters {
-		if voter.Username == username {
-			room.Voters = append(room.Voters[:i], room.Voters[i+1:]...)
-			room.Spectators = append(room.Spectators, voter)
-			delete(room.CurrentRound.Votes, voter.Username)
-			break
-		}
+	if value, loaded := room.Voters.LoadAndDelete(username); loaded {
+		voter := value.(*user.Connection)
+		room.Spectators.Store(username, voter)
+
+		room.CurrentRound.Votes.Delete(voter.Username)
 	}
 }
+
 func Get(roomId string) (*Room, bool) {
-	room, found := rooms[roomId]
-	return room, found
+	value, found := rooms.Load(roomId)
+	if !found {
+		return nil, false
+	}
+	return value.(*Room), true
 }
+
 func GetLength() int {
-	return len(rooms)
+	count := 0
+	rooms.Range(func(key, value interface{}) bool {
+		count++
+		return true
+	})
+	return count
 }
+
 func (room *Room) UserHasVoted(username string) bool {
-	room.Mu.RLock()
-	_, found := room.CurrentRound.Votes[username]
-	room.Mu.RUnlock()
+	_, found := room.CurrentRound.Votes.Load(username)
 	return found
 }
+
 func (room *Room) IncludeUsername(username string) bool {
-	for _, voter := range room.Voters {
-		if voter.Username == username {
-			return true
-		}
+	if _, ok := room.Voters.Load(username); ok {
+		return true
 	}
-	for _, spectator := range room.Spectators {
-		if spectator.Username == username {
-			return true
-		}
+	if _, ok := room.Spectators.Load(username); ok {
+		return true
 	}
 	return false
 }
+
 func New() *Room {
 	roomId := uuid.New().String()
-	room := Room{Id: roomId, Voters: make([]*user.Connection, 0), Spectators: make([]*user.Connection, 0), CurrentRound: nil}
+	room := Room{
+		Id:           roomId,
+		Voters:       sync.Map{},
+		Spectators:   sync.Map{},
+		CurrentRound: nil,
+	}
 	round := NewRound()
 	room.CurrentRound = round
-	rooms[roomId] = &room
+	rooms.Store(roomId, &room)
 	return &room
 }
+
 func (room *Room) ConvertUserRole(username string, role string) {
 	if role == "voter" {
 		room.convertSpectatorToVoter(username)
@@ -95,92 +112,145 @@ func (room *Room) ConvertUserRole(username string, role string) {
 	}
 	room.emitUsersAndRevealableRound()
 }
+
 func (room *Room) Connections() []*user.Connection {
-	return append(room.Voters, room.Spectators...)
+	connections := make([]*user.Connection, 0)
+
+	// Collect all voters
+	room.Voters.Range(func(key, value interface{}) bool {
+		connections = append(connections, value.(*user.Connection))
+		return true
+	})
+
+	// Collect all spectators
+	room.Spectators.Range(func(key, value interface{}) bool {
+		connections = append(connections, value.(*user.Connection))
+		return true
+	})
+
+	return connections
 }
+
 func (room *Room) IsEmpty() bool {
-	return len(room.Voters) == 0 && len(room.Spectators) == 0
+	votersEmpty := true
+	spectatorsEmpty := true
+
+	room.Voters.Range(func(key, value interface{}) bool {
+		votersEmpty = false
+		return false // Stop iteration
+	})
+
+	if votersEmpty {
+		room.Spectators.Range(func(key, value interface{}) bool {
+			spectatorsEmpty = false
+			return false // Stop iteration
+		})
+	}
+
+	return votersEmpty && spectatorsEmpty
 }
 
 func (r *Room) Close() {
-	r.Mu.RLock()
-	defer r.Mu.RUnlock()
-	delete(rooms, r.Id)
+	rooms.Delete(r.Id)
 }
+
 func (room *Room) Vote(username string, storyPoints int) {
-	if !room.CurrentRound.Revealed {
-		room.Mu.RLock()
-		room.CurrentRound.Votes[username] = storyPoints
-		room.Mu.RUnlock()
+	if !room.CurrentRound.IsRevealed() {
+		room.CurrentRound.Votes.Store(username, storyPoints)
+		voterCount := room.GetVoterCount()
+		revealable := room.CurrentRound.IsRevealable(voterCount)
+
+		connections := room.Connections()
 		event := events.UserVotedEvent{Username: username, Event: events.Event{Type: events.UserVoted}}
-		events.Broadcast(event, room.Connections()...)
-		revealEvent := events.RoundRevealAvailableEvent{Event: events.Event{Type: events.RoundRevealAvailable}, RevealAvailable: room.CurrentRound.IsRevealable(len(room.Voters))}
-		events.Broadcast(revealEvent, room.Connections()...)
+		events.Broadcast(event, connections...)
+		revealEvent := events.RoundRevealAvailableEvent{Event: events.Event{Type: events.RoundRevealAvailable}, RevealAvailable: revealable}
+		events.Broadcast(revealEvent, connections...)
 	}
 }
 
-// a client can either connect as a "voter" or a "spectator". Any other role will result in panic
 func (room *Room) AddClient(client *user.Connection, role string) error {
 	switch role {
 	case "voter":
-		room.Voters = append(room.Voters, client)
+		room.Voters.Store(client.Username, client)
 	case "spectator":
-		room.Spectators = append(room.Spectators, client)
+		room.Spectators.Store(client.Username, client)
 	}
-	room.emitUsersAndRevealableRound()
 
+	room.emitUsersAndRevealableRound()
 	go room.readMessage(client)
 	log.Printf("%v joined room %v", client.Username, room.Id)
 	return nil
 }
+
 func (room *Room) removeClient(client *user.Connection) {
-	room.Mu.RLock()
-	for i, c := range room.Voters {
-		if c == client {
-			room.Voters = append(room.Voters[:i], room.Voters[i+1:]...)
-			if !room.CurrentRound.Revealed {
-				delete(room.CurrentRound.Votes, c.Username)
-			}
+	// Try to remove from voters
+	if _, loaded := room.Voters.LoadAndDelete(client.Username); loaded {
+		if !room.CurrentRound.IsRevealed() {
+			room.CurrentRound.Votes.Delete(client.Username)
+			room.emitUsersAndRevealableRound()
 		}
+	} else {
+		// Try to remove from spectators
+		room.Spectators.Delete(client.Username)
 	}
-	for i, c := range room.Spectators {
-		if c == client {
-			room.Spectators = append(room.Spectators[:i], room.Spectators[i+1:]...)
-		}
-	}
-	room.Mu.RUnlock()
-	if !room.CurrentRound.Revealed {
-		room.emitUsersAndRevealableRound()
-	}
+
 	log.Printf("%v left room %v", client.Username, room.Id)
 }
+
 func (room *Room) RevealCurrentRound() {
-	if !room.CurrentRound.IsRevealable(len(room.Voters)) {
-		log.Println("Cannot reveal round. Not enough votes. RoundId: ", room.Id)
+	voterCount := room.GetVoterCount()
+	if !room.CurrentRound.IsRevealable(voterCount) {
+		log.Println("Cannot reveal round. Not enough votes. RoomId: ", room.Id)
 		return
 	}
-	event := events.RoundRevealedEvent{Event: events.Event{Type: events.RoundRevealed}, Votes: room.CurrentRound.Votes}
-	room.CurrentRound.Revealed = true
-	events.Broadcast(event, room.Connections()...)
+
+	room.CurrentRound.SetRevealed(true)
+	votes := room.CurrentRound.GetVotesMap()
+
+	connections := room.Connections()
+	event := events.RoundRevealedEvent{Event: events.Event{Type: events.RoundRevealed}, Votes: votes}
+	events.Broadcast(event, connections...)
 }
+
 func (room *Room) emitUsersAndRevealableRound() {
 	users := make([]user.User, 0)
-	for _, client := range room.Voters {
-		users = append(users, user.User{Username: client.Username, IsVoter: true, HasVoted: room.UserHasVoted(client.Username)})
-	}
-	for _, client := range room.Spectators {
+
+	// Collect voters
+	room.Voters.Range(func(key, value interface{}) bool {
+		client := value.(*user.Connection)
+		hasVoted := room.UserHasVoted(client.Username)
+		users = append(users, user.User{Username: client.Username, IsVoter: true, HasVoted: hasVoted})
+		return true
+	})
+
+	// Collect spectators
+	room.Spectators.Range(func(key, value interface{}) bool {
+		client := value.(*user.Connection)
 		users = append(users, user.User{Username: client.Username, IsVoter: false})
-	}
+		return true
+	})
+
+	revealed := room.CurrentRound.IsRevealed()
+	voterCount := room.GetVoterCount()
+	revealable := room.CurrentRound.IsRevealable(voterCount)
+
+	room.cancelMu.RLock()
+	cancelChan := room.cancelReveal
+	room.cancelMu.RUnlock()
+
+	connections := room.Connections()
 	event := events.UsersUpdatedEvent{Users: users, Event: events.Event{Type: events.UsersUpdated}}
-	events.Broadcast(event, room.Connections()...)
-	room.Mu.RLock()
-	if !room.CurrentRound.Revealed {
-		revealableEvent := events.RoundRevealAvailableEvent{Event: events.Event{Type: events.RoundRevealAvailable}, RevealAvailable: room.CurrentRound.IsRevealable(len(room.Voters))}
-		room.Mu.RUnlock()
-		if room.cancelReveal != nil {
-			room.cancelReveal <- true
+	events.Broadcast(event, connections...)
+
+	if !revealed {
+		revealableEvent := events.RoundRevealAvailableEvent{Event: events.Event{Type: events.RoundRevealAvailable}, RevealAvailable: revealable}
+		if cancelChan != nil {
+			select {
+			case cancelChan <- true:
+			default:
+			}
 		}
-		events.Broadcast(revealableEvent, room.Connections()...)
+		events.Broadcast(revealableEvent, connections...)
 	} else {
 		room.RevealCurrentRound()
 	}
@@ -190,13 +260,25 @@ func (room *Room) readMessage(client *user.Connection) {
 	defer client.Close()
 	client.SetReadLimit(maxMessageSize)
 	client.SetReadDeadline(time.Now().Add(pongWait))
+
 	for {
 		_, message, err := client.ReadMessage()
 		if err != nil {
 			log.Printf("Client %v: error: %v", client.Username, err)
-			if client.IsVoter && room.cancelReveal != nil {
-				room.cancelReveal <- true
+
+			room.cancelMu.RLock()
+			cancelChan := room.cancelReveal
+			room.cancelMu.RUnlock()
+
+			_, isVoter := room.Voters.Load(client.Username)
+
+			if isVoter && cancelChan != nil {
+				select {
+				case cancelChan <- true:
+				default:
+				}
 			}
+
 			room.removeClient(client)
 			if room.IsEmpty() {
 				log.Printf("Room %s is empty. Closing room", room.Id)
@@ -204,17 +286,20 @@ func (room *Room) readMessage(client *user.Connection) {
 			}
 			break
 		}
+
 		var a actions.Action
 		err = json.Unmarshal(message, &a)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
+
 		switch a.Type {
 		case actions.Ping:
 			client.SetReadDeadline(time.Now().Add(pongWait))
 			log.Printf("%v refreshed connection deadline", client.Username)
 			client.WriteJSON(events.PongEvent{Event: events.Event{Type: events.Pong}})
+
 		case actions.UserToVote:
 			var action actions.UserToVoteAction
 			err = json.Unmarshal(message, &action)
@@ -223,43 +308,69 @@ func (room *Room) readMessage(client *user.Connection) {
 				continue
 			}
 			room.Vote(client.Username, action.StoryPoints)
+
 		case actions.RoundToReveal:
-			event := events.RoundToRevealEvent{Event: events.Event{Type: events.RoundToReveal}, After: 5000} // after in ms
-			events.Broadcast(event, room.Connections()...)
+			connections := room.Connections()
+			event := events.RoundToRevealEvent{Event: events.Event{Type: events.RoundToReveal}, After: 5000}
+			events.Broadcast(event, connections...)
 			reveal, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			room.Mu.RLock()
+
+			room.cancelMu.Lock()
 			room.cancelReveal = make(chan bool, 1)
-			room.Mu.RUnlock()
-			go waitForCancelReveal(room, reveal, cancel)
+			room.cancelMu.Unlock()
+
+			go room.waitForCancelReveal(reveal, cancel)
+
 		case actions.CancelReveal:
-			room.cancelReveal <- true
+			room.cancelMu.RLock()
+			cancelChan := room.cancelReveal
+			room.cancelMu.RUnlock()
+
+			if cancelChan != nil {
+				select {
+				case cancelChan <- true:
+				default:
+				}
+			}
+
 		case actions.RoundToStart:
 			room.CurrentRound = NewRound()
+
+			connections := room.Connections()
 			event := events.RoundStartedEvent{Event: events.Event{Type: events.RoundStarted}}
-			events.Broadcast(event, room.Connections()...)
+			events.Broadcast(event, connections...)
 			room.emitUsersAndRevealableRound()
+
 		case actions.ChangeRole:
 			var action actions.ChangeRoleAction
 			err = json.Unmarshal(message, &action)
 			if err != nil {
-				log.Println("Error parsing user vote:", err)
+				log.Println("Error parsing change role:", err)
 				continue
 			}
 			room.ConvertUserRole(client.Username, action.Role)
 		}
 	}
 }
-func waitForCancelReveal(room *Room, reveal context.Context, cancel context.CancelFunc) {
+
+func (room *Room) waitForCancelReveal(reveal context.Context, cancel context.CancelFunc) {
+	room.cancelMu.RLock()
+	cancelChan := room.cancelReveal
+	room.cancelMu.RUnlock()
+
 	select {
-	case <-room.cancelReveal:
+	case <-cancelChan:
 		log.Println("Cancel reveal")
+		connections := room.Connections()
 		event := events.CancelRevealEvent{Event: events.Event{Type: events.CancelReveal}}
-		events.Broadcast(event, room.Connections()...)
+		events.Broadcast(event, connections...)
 		cancel()
+
 	case <-reveal.Done():
 		room.RevealCurrentRound()
 	}
-	room.Mu.RLock()
+
+	room.cancelMu.Lock()
 	room.cancelReveal = nil
-	room.Mu.RUnlock()
+	room.cancelMu.Unlock()
 }
