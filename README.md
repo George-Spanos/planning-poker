@@ -61,12 +61,3 @@ So if you are a privacy freak like us, you can host this yourself. If not, **we 
 Moby IT does not claim any ownership on the idea of Agile Planning Poker. As mentioned in the [planningpoker.com](https://www.planningpoker.com/), the idea was popularized by Mike Cohn, Founding Member and Owner of [Mountain Goat Software](https://www.mountaingoatsoftware.com/).
 
 Moby IT only aims to provide an open source and free solution to teams that want to use this method to do planning. The software is licenced under [Apache Licence, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
----
-
-<h3 align="center">
-<img src="https://moby-it.com/MobyIT_Icon_50.png" width="30"/>
-Build by Moby IT
-<img src="https://moby-it.com/MobyIT_Icon_50.png"  width="30"/>
-
-</h3>
