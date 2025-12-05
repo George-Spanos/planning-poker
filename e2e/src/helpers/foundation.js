@@ -31,6 +31,7 @@ export async function runTest(name, test) {
 }
 export async function createBrowser() {
   return await launch({
+    headless:"new",
     args: ["--incognito", "--no-sandbox", "--disable-setuid-sandbox"],
     executablePath: "google-chrome-stable",
   });
