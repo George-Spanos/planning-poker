@@ -18,7 +18,7 @@ export const Header: Component = () => {
       </Show>
       <span>
         Made By{" "}
-        <a class="moby-link" href="https://moby-it.com" target="_black">
+        <a class="moby-link" href="https://gspanos.tech" target="_black">
           Moby IT
         </a>
       </span>
