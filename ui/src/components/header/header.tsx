@@ -16,12 +16,6 @@ export const Header: Component = () => {
       <Show when={showLogo()}>
         <Logo />
       </Show>
-      <span>
-        Made By{" "}
-        <a class="moby-link" href="https://gspanos.tech" target="_black">
-          Moby IT
-        </a>
-      </span>
     </div>
   );
 };

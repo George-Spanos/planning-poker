@@ -71,11 +71,11 @@ export function registerAnimations(): [Accessor<number>, Setter<number>] {
     return showTags();
   });
   // show 'made by moby' on top right
-  createEffect((prev) => {
-    if (showBy() && !prev) {
-      anime(fade('.header span'));
-    }
-    return showBy();
-  });
+  // createEffect((prev) => {
+  //   if (showBy() && !prev) {
+  //     anime(fade('.header span'));
+  //   }
+  //   return showBy();
+  // });
   return [timer, setTimer];
 }
