@@ -1,6 +1,6 @@
 
 
-FROM mobyit/puppeteer-chrome-linux:stable 
+FROM ghcr.io/george-spanos/puppeteer-chrome-linux:stable
 
 ENV URL http://ui
 RUN npm i -g pnpm@9.0.4
