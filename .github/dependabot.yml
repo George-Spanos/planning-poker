@@ -3,12 +3,24 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    groups:
+      actions:
+        patterns:
+          - "*"
   - package-ecosystem: "gomod"
     directory: "/api"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    groups:
+      go-deps:
+        patterns:
+          - "*"
   - package-ecosystem: "npm"
     directory: "/ui"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    groups:
+      npm-deps:
+        patterns:
+          - "*"
