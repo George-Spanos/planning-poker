@@ -13,7 +13,7 @@ importers:
         version: 0.7.0(solid-js@1.6.10)
       '@tanstack/solid-query':
         specifier: ^5.40.0
-        version: 5.40.0(solid-js@1.6.10)
+        version: 5.96.0(solid-js@1.6.10)
       animejs:
         specifier: ^3.2.2
         version: 3.2.2
@@ -402,11 +402,11 @@ packages:
       '@solidjs/router': '>=0.6.0'
       solid-js: '>=1.0.0'
 
-  '@tanstack/query-core@5.40.0':
-    resolution: {integrity: sha512-eD8K8jsOIq0Z5u/QbvOmfvKKE/XC39jA7yv4hgpl/1SRiU+J8QCIwgM/mEHuunQsL87dcvnHqSVLmf9pD4CiaA==}
+  '@tanstack/query-core@5.96.0':
+    resolution: {integrity: sha512-sfO3uQeol1BU7cRP6NYY7nAiX3GiNY20lI/dtSbKLwcIkYw/X+w/tEsQAkc544AfIhBX/IvH/QYtPHrPhyAKGw==}
 
-  '@tanstack/solid-query@5.40.0':
-    resolution: {integrity: sha512-o8kDtKRjShxi9tVNTp6IWGxZmX8lHPt0IsVSCGK4+kGX0c112HWD8lE3rxOKPtGrIAVqDhIgcE7e51UrR0W3iw==}
+  '@tanstack/solid-query@5.96.0':
+    resolution: {integrity: sha512-sp0Tj2ZOk93nuj35ZxjdOIycB2vJLKXp2w2KiknNLe4a6b6n77bmv+AHIbxjNMeyyqsJILcNOKM0gFGZmCSZ7g==}
     peerDependencies:
       solid-js: ^1.6.0
 
@@ -1741,11 +1741,11 @@ snapshots:
       '@testing-library/dom': 9.3.4
       solid-js: 1.6.10
 
-  '@tanstack/query-core@5.40.0': {}
+  '@tanstack/query-core@5.96.0': {}
 
-  '@tanstack/solid-query@5.40.0(solid-js@1.6.10)':
+  '@tanstack/solid-query@5.96.0(solid-js@1.6.10)':
     dependencies:
-      '@tanstack/query-core': 5.40.0
+      '@tanstack/query-core': 5.96.0
       solid-js: 1.6.10
 
   '@testing-library/dom@9.3.4':
