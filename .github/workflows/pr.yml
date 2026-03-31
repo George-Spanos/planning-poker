@@ -6,16 +6,16 @@ on:
       - main
 jobs:
   test-api:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Test api
         working-directory: api
         run: make test
   test-ui:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Test ui
         run: |
           docker compose -f docker-compose.test.yml build
