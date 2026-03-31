@@ -13,7 +13,7 @@ importers:
         version: 0.7.0(solid-js@1.6.10)
       '@tanstack/solid-query':
         specifier: ^5.40.0
-        version: 5.40.0(solid-js@1.6.10)
+        version: 5.96.0(solid-js@1.6.10)
       animejs:
         specifier: ^3.2.2
         version: 3.2.2
@@ -393,11 +393,11 @@ packages:
     peerDependencies:
       solid-js: '>=1.0.0'
 
-  '@tanstack/query-core@5.40.0':
-    resolution: {integrity: sha512-eD8K8jsOIq0Z5u/QbvOmfvKKE/XC39jA7yv4hgpl/1SRiU+J8QCIwgM/mEHuunQsL87dcvnHqSVLmf9pD4CiaA==}
+  '@tanstack/query-core@5.96.0':
+    resolution: {integrity: sha512-sfO3uQeol1BU7cRP6NYY7nAiX3GiNY20lI/dtSbKLwcIkYw/X+w/tEsQAkc544AfIhBX/IvH/QYtPHrPhyAKGw==}
 
-  '@tanstack/solid-query@5.40.0':
-    resolution: {integrity: sha512-o8kDtKRjShxi9tVNTp6IWGxZmX8lHPt0IsVSCGK4+kGX0c112HWD8lE3rxOKPtGrIAVqDhIgcE7e51UrR0W3iw==}
+  '@tanstack/solid-query@5.96.0':
+    resolution: {integrity: sha512-sp0Tj2ZOk93nuj35ZxjdOIycB2vJLKXp2w2KiknNLe4a6b6n77bmv+AHIbxjNMeyyqsJILcNOKM0gFGZmCSZ7g==}
     peerDependencies:
       solid-js: ^1.6.0
 
@@ -466,6 +466,7 @@ packages:
 
   abab@2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
+    deprecated: Use your platform's native atob() and btoa() methods instead
 
   acorn-globals@7.0.1:
     resolution: {integrity: sha512-umOSDSDrfHbTNPuNpC2NSnnA3LUrqpevPb4T9jRx4MagXNS0rs+gwiTcAvqCRmsD6utzsrzNt+ebm00SNWiC3Q==}
@@ -669,6 +670,7 @@ packages:
   domexception@4.0.0:
     resolution: {integrity: sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw==}
     engines: {node: '>=12'}
+    deprecated: Use your platform's native DOMException instead
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -959,6 +961,7 @@ packages:
 
   loupe@2.3.6:
     resolution: {integrity: sha512-RaPMZKiMy8/JruncMU5Bt6na1eftNoo++R4Y+N2FrxkDVTrGvcyzFTsaGif4QTeKESheMGegbhw6iUAq+5A8zA==}
+    deprecated: Please upgrade to 2.3.7 which fixes GHSA-4q6p-r6v2-jvc5
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
@@ -1330,6 +1333,7 @@ packages:
   whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -1718,11 +1722,11 @@ snapshots:
       '@testing-library/dom': 8.20.0
       solid-js: 1.6.10
 
-  '@tanstack/query-core@5.40.0': {}
+  '@tanstack/query-core@5.96.0': {}
 
-  '@tanstack/solid-query@5.40.0(solid-js@1.6.10)':
+  '@tanstack/solid-query@5.96.0(solid-js@1.6.10)':
     dependencies:
-      '@tanstack/query-core': 5.40.0
+      '@tanstack/query-core': 5.96.0
       solid-js: 1.6.10
 
   '@testing-library/dom@8.20.0':
