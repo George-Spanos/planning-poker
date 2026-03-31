@@ -17,9 +17,9 @@ describe("ProgressBar", () => {
 
         expect(bar).toBeTruthy();
 
-        // Initial state - should be at or near 0%
+        // Initial state - should be at or near 100%
         const initialWidth = parseFloat(bar.style.width);
-        expect(initialWidth).toBeLessThan(5);
+        expect(initialWidth).toBeGreaterThan(95);
 
         // After 2.5 seconds (halfway), should be around 50%
         vi.advanceTimersByTime(2500);
@@ -29,11 +29,11 @@ describe("ProgressBar", () => {
             expect(midWidth).toBeLessThan(55);
         });
 
-        // After 5 seconds, should be at 100%
+        // After 5 seconds, should be at 0%
         vi.advanceTimersByTime(2500);
         await waitFor(() => {
             const finalWidth = parseFloat(bar.style.width);
-            expect(finalWidth).toBeGreaterThanOrEqual(100);
+            expect(finalWidth).toBeLessThanOrEqual(0);
         });
     });
 
@@ -51,20 +51,20 @@ describe("ProgressBar", () => {
             expect(midWidth).toBeLessThan(55);
         });
 
-        // After 3 seconds, should be at 100%
+        // After 3 seconds, should be at 0%
         vi.advanceTimersByTime(1500);
         await waitFor(() => {
             const finalWidth = parseFloat(bar.style.width);
-            expect(finalWidth).toBeGreaterThanOrEqual(100);
+            expect(finalWidth).toBeLessThanOrEqual(0);
         });
     });
 
-    it("should start at approximately 0% width", () => {
+    it("should start at approximately 100% width", () => {
         const { container } = render(() => <ProgressBar duration={5000} />);
         const bar = container.querySelector("#bar") as HTMLElement;
 
         const initialWidth = parseFloat(bar.style.width);
-        expect(initialWidth).toBeLessThan(5);
+        expect(initialWidth).toBeGreaterThan(95);
     });
 
     it("should clean up interval on unmount", () => {
