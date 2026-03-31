@@ -27,14 +27,14 @@ jobs:
         run: |
           echo "${{ secrets.UI_ENV }}" > ui/.env.production
       - name: Log in to registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ secrets.CONTAINER_USERNAME }}
           password: ${{ secrets.CONTAINER_PASSWORD }}
 
       - name: Build and push container image to registry
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: ${{ secrets.REPOSITORY_NAME }}/planning-poker-ui:${{ github.sha }},${{ secrets.REPOSITORY_NAME }}/planning-poker-ui:latest,
