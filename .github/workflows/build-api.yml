@@ -7,6 +7,10 @@ on:
       - "api/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     runs-on: ubuntu-24.04
@@ -35,5 +39,5 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
-          tags: ${{ secrets.REPOSITORY_NAME }}/planning-poker-api:${{ github.sha }},${{ secrets.REPOSITORY_NAME }}/planning-poker-api:latest,
+          tags: ${{ secrets.REPOSITORY_NAME }}/planning-poker-api:${{ github.sha }},${{ secrets.REPOSITORY_NAME }}/planning-poker-api:latest
           context: ./api
