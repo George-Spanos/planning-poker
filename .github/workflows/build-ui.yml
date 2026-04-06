@@ -15,6 +15,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    environment: prod
     steps:
       - uses: actions/checkout@v6
       - name: Test ui
