@@ -49,7 +49,7 @@ export const RoomHeader: Component = () => {
         when={roundStatus() === RoundStatuses.Revealed}
         fallback={<h2>{roomHeader()}</h2>}
       >
-        <div class="stats-container">
+        <div class="stats-container" data-testid="stats-container">
           <div class="stat-item">
             <span class="stat-label">Average</span>
             <span class="stat-value">{averageScore()?.toFixed(1)}</span>
