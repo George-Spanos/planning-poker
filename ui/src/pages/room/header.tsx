@@ -50,19 +50,19 @@ export const RoomHeader: Component = () => {
         fallback={<h2>{roomHeader()}</h2>}
       >
         <div class="stats-container" data-testid="stats-container">
-          <div class="stat-item">
-            <span class="stat-label">Average</span>
-            <span class="stat-value">{averageScore()?.toFixed(1)}</span>
+          <div class="item">
+            <span class="label">Average</span>
+            <span class="value">{averageScore()?.toFixed(1)}</span>
           </div>
-          <div class="stat-divider" />
-          <div class="stat-item">
-            <span class="stat-label">Standard Deviation</span>
-            <span class="stat-value">{standardDeviation()?.toFixed(1)}</span>
+          <div class="divider" />
+          <div class="item">
+            <span class="label">Standard Deviation</span>
+            <span class="value">{standardDeviation()?.toFixed(1)}</span>
           </div>
-          <div class="stat-divider" />
-          <div class="stat-item verdict">
-            <span class="stat-label">Verdict</span>
-            <span class="stat-value">{verdict()}</span>
+          <div class="divider" />
+          <div class="item verdict">
+            <span class="label">Verdict</span>
+            <span class="value">{verdict()}</span>
           </div>
         </div>
       </Show>

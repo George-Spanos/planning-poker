@@ -116,23 +116,10 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
       const votes = Object.values(data.votes);
       const count = votes.length;
       const averageScore = count > 0 ? votes.reduce((a, b) => a + b, 0) / count : 0;
-      
+
       const variance = count > 0 ? votes.reduce((sum, val) => sum + Math.pow(val - averageScore, 2), 0) / count : 0;
       const stdDev = Math.sqrt(variance);
 
-      // Helper to find the closest Fibonacci number, factoring in standard deviation for the verdict
-      const getClosestFibonacci = (num: number) => {
-        if (num <= 0) return 0;
-        let a = 0;
-        let b = 1;
-        while (b < num) {
-          const temp = b;
-          b = a + b;
-          a = temp;
-        }
-        return (num - a < b - num) ? a : b;
-      };
-      
       const calculatedVerdict = getClosestFibonacci(averageScore + stdDev / 2);
 
       batch(() => {
@@ -181,6 +168,19 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   };
   return <RoomContext.Provider value={ctx}>{props.children}</RoomContext.Provider>;
 }
+
+function getClosestFibonacci(num: number): number {
+  if (num <= 0) return 0;
+  let a = 0;
+  let b = 1;
+  while (b < num) {
+    const temp = b;
+    b = a + b;
+    a = temp;
+  }
+  return (num - a < b - num) ? a : b;
+};
+
 export function useRoomContext() {
   const ctx = useContext(RoomContext);
   if (!ctx) throw new Error("room context not initialzed");
