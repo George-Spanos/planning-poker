@@ -24,7 +24,7 @@ import "./room.css";
 import { useRoomContext } from "./roomState";
 import { RoomSubheader } from "./subheader";
 import { SubmitBtn } from "./submitBtn";
-import anime from 'animejs/lib/anime.es.js';
+import anime from 'animejs';
 
 const Room: Component = () => {
   const [roomEl, setRoomEl] = createSignal<Element | null>(null);

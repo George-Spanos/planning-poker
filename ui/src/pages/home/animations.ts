@@ -1,4 +1,4 @@
-import anime from 'animejs/lib/anime.es.js';
+import anime from 'animejs';
 import { Accessor, Setter, createEffect, createSignal } from "solid-js";
 
 export function transformH1() {

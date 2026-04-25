@@ -1,11 +1,11 @@
 
-FROM node:18.12.0-alpine AS build
+FROM node:22-alpine AS build
 
 ARG MODE=production
 
 WORKDIR /app
 
-RUN npm i -g pnpm@9.0.4
+RUN npm i -g pnpm@10.33.0
 
 COPY package.json pnpm-lock.yaml ./
 

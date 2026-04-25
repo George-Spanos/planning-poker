@@ -134,6 +134,43 @@ export async function CancelRoundReveal($document) {
   const $cancelButton = await getByTestId($document, "cancel-reveal");
   await $cancelButton.click();
 }
+export async function GetRevealedStats($document) {
+  const $stats = await getByTestId($document, "stats-container");
+  return await $stats.evaluate((el) => {
+    const items = Array.from(el.querySelectorAll(".item"));
+    const read = (label) => {
+      const item = items.find(
+        (i) => i.querySelector(".label")?.textContent?.trim() === label
+      );
+      return item?.querySelector(".value")?.textContent?.trim();
+    };
+    return {
+      average: read("Average"),
+      standardDeviation: read("Standard Deviation"),
+      verdict: read("Verdict"),
+    };
+  });
+}
+export async function StatsShouldBe($document, expected) {
+  const actual = await GetRevealedStats($document);
+  for (const key of Object.keys(expected)) {
+    if (actual[key] !== expected[key])
+      throw new Error(
+        `Stat "${key}" mismatch: expected "${expected[key]}", got "${actual[key]}"`
+      );
+  }
+}
+export async function StatsShouldBeCleared($document) {
+  try {
+    await waitFor(() => getByTestId($document, "stats-container"), {
+      timeout: 500,
+      interval: 100,
+    });
+  } catch (e) {
+    return;
+  }
+  throw new Error("Stats container should not be visible after starting a new round");
+}
 export async function ShouldHaveSelectedVoted() {
 
 }
