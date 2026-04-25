@@ -94,7 +94,7 @@ export async function RevealRound($document) {
 }
 export async function RoundRevealed($document) {
   try {
-    await waitFor(() => getByTestId($document, "Average Score"), {
+    await waitFor(() => queries.getByText($document, /Average Score/i), {
       timeout: 7000,
     });
     return true;
