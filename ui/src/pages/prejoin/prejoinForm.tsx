@@ -13,7 +13,7 @@ import { Button } from "../../components/button/button";
 import { Toggle } from "../../components/toggle/toggle";
 import { apiV1Url } from "../../config";
 import "./prejoinForm.css";
-import anime from 'animejs/lib/anime.es.js';
+import anime from 'animejs';
 import { fade } from "../home/animations";
 import { createQuery, useQueryClient } from "@tanstack/solid-query";
 

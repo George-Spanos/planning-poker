@@ -6,6 +6,8 @@ import {
   RevealRound,
   RoundRevealed,
   StartNewRound,
+  StatsShouldBe,
+  StatsShouldBeCleared,
   TryChangeRole,
 } from "../helpers/commands.js";
 import { runTest } from "../helpers/foundation.js";
@@ -73,6 +75,19 @@ export async function TestRevealRound(documents, roomId) {
   );
   console.log("\tAfter the round is revealed");
 
+  // Votes cast in TestVoting were 1, 2, 3 → avg=2.0, sd≈0.816, verdict=closestFib(2.408)=2
+  const expectedStats = {
+    average: "2.0",
+    standardDeviation: "0.8",
+    verdict: "2",
+  };
+  for (const document of documents) {
+    await runTest(
+      "\tRevealed stats (avg / sd / verdict) should match the cast votes",
+      () => StatsShouldBe(document, expectedStats)
+    );
+  }
+
   const { $document } = await voterJoinsRoom(roomId, "maria");
   for (const document of [...documents, $document]) {
     await runTest("\tRound reveal should still be revealed", () => {
@@ -82,4 +97,9 @@ export async function TestRevealRound(documents, roomId) {
   await runTest("\tShould be able to start new Round", () =>
     StartNewRound(documents[0])
   );
+  for (const document of documents) {
+    await runTest("\tStats should be cleared after a new round starts", () =>
+      StatsShouldBeCleared(document)
+    );
+  }
 }

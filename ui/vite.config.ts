@@ -13,7 +13,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     transformMode: { web: [/\.[jt]sx?$/] },
-    setupFiles: ["node_modules/@testing-library/jest-dom/extend-expect.js"],
+    setupFiles: ["node_modules/@testing-library/jest-dom/vitest.js"],
     // otherwise, solid would be loaded twice:
     deps: { registerNodeLoader: true },
     // if you have few tests, try commenting one
