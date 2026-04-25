@@ -1,4 +1,4 @@
-import { Accessor, JSX, JSXElement, batch, createContext, createSignal, useContext } from "solid-js";
+import { Accessor, JSX, batch, createContext, createSignal, useContext } from "solid-js";
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { username } from "../../common/state";
 import { User } from "../../common/user";
@@ -33,6 +33,8 @@ export const RoomContext = createContext<{
   revealing: () => boolean;
   revealable: () => boolean;
   averageScore: Accessor<number | null>;
+  standardDeviation: Accessor<number | null>;
+  verdict: Accessor<number | null>;
   roundScore: () => string | undefined;
   addPointsToVoter: (points: number) => void;
   handleWsMessage: (event: MessageEvent<unknown>) => void;
@@ -46,10 +48,17 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   const revealed = () => roundStatus() === RoundStatuses.Revealed;
   const revealing = () => roundStatus() === RoundStatuses.Revealing;
   const revealable = () => roundStatus() === RoundStatuses.Revealable;
-  const [averageScore, setAverageScore] = createSignal<number | null>(
-    null
-  );
-  const roundScore = () => averageScore()?.toFixed(1);
+  const [averageScore, setAverageScore] = createSignal<number | null>(null);
+  const [standardDeviation, setStandardDeviation] = createSignal<number | null>(null);
+  const [verdict, setVerdict] = createSignal<number | null>(null);
+
+  const roundScore = () => {
+    const avg = averageScore();
+    const sd = standardDeviation();
+    const v = verdict();
+    if (avg == null || sd == null || v == null) return undefined;
+    return `Avg: ${avg.toFixed(1)} | SD: ${sd.toFixed(1)} | Verdict: ${v}`;
+  };
   function addPointsToVoter(points: number) {
     setVoters(
       (voter) => voter.username === username(),
@@ -104,11 +113,32 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
         setRoundStatus(RoundStatuses.Revealable);
     }
     else if (isRoundRevealed(data)) {
-      const averageScore =
-        Object.values(data.votes).reduce((a, b) => a + b, 0) /
-        Object.values(data.votes).length;
+      const votes = Object.values(data.votes);
+      const count = votes.length;
+      const averageScore = count > 0 ? votes.reduce((a, b) => a + b, 0) / count : 0;
+      
+      const variance = count > 0 ? votes.reduce((sum, val) => sum + Math.pow(val - averageScore, 2), 0) / count : 0;
+      const stdDev = Math.sqrt(variance);
+
+      // Helper to find the closest Fibonacci number, factoring in standard deviation for the verdict
+      const getClosestFibonacci = (num: number) => {
+        if (num <= 0) return 0;
+        let a = 0;
+        let b = 1;
+        while (b < num) {
+          const temp = b;
+          b = a + b;
+          a = temp;
+        }
+        return (num - a < b - num) ? a : b;
+      };
+      
+      const calculatedVerdict = getClosestFibonacci(averageScore + stdDev / 2);
+
       batch(() => {
         setAverageScore(averageScore);
+        setStandardDeviation(stdDev);
+        setVerdict(calculatedVerdict);
         setRoundStatus(RoundStatuses.Revealed);
         setVoters(
           produce((voters) =>
@@ -125,6 +155,8 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
         setRoundStatus(RoundStatuses.Started);
         setVoters(voters.map((v) => ({ ...v, voted: false, points: undefined })));
         setAverageScore(null);
+        setStandardDeviation(null);
+        setVerdict(null);
       });
     } else if (isPong(data)) {
       // ignore
@@ -135,6 +167,8 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   const ctx = {
     addPointsToVoter,
     averageScore,
+    standardDeviation,
+    verdict,
     handleWsMessage,
     roundStatus,
     revealable,

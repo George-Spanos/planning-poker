@@ -5,12 +5,49 @@
 }
 .room-header {
   width: 100%;
-  height: 87px;
+  min-height: 87px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 24px;
+}
+.stats-container {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: var(--primary--light);
+  padding: 16px 32px;
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--primary--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary--dark);
+}
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--primary);
+  opacity: 0.3;
+}
+.stat-item.verdict .stat-value {
+  color: var(--primary);
+  font-size: 2.5rem;
 }
 .room-subheader {
   display: flex;
