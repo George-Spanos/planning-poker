@@ -13,10 +13,10 @@ importers:
         version: 0.16.1(solid-js@1.9.12)
       '@tanstack/solid-query':
         specifier: ^5.40.0
-        version: 5.100.1(solid-js@1.9.12)
+        version: 5.100.7(solid-js@1.9.12)
       animejs:
-        specifier: ^3.2.2
-        version: 3.2.2
+        specifier: ^4.4.1
+        version: 4.4.1
       solid-js:
         specifier: ^1.9.12
         version: 1.9.12
@@ -25,7 +25,7 @@ importers:
         version: 0.5.0(solid-js@1.9.12)
       zod:
         specifier: ^4.3.6
-        version: 4.3.6
+        version: 4.4.2
     devDependencies:
       '@solidjs/testing-library':
         specifier: ^0.8.10
@@ -38,7 +38,7 @@ importers:
         version: 3.1.13
       jsdom:
         specifier: ^29.0.1
-        version: 29.0.2
+        version: 29.1.1
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -50,7 +50,7 @@ importers:
         version: 2.11.12(@testing-library/jest-dom@6.9.1)(solid-js@1.9.12)(vite@8.0.10)
       vitest:
         specifier: ^4.1.2
-        version: 4.1.5(jsdom@29.0.2)(vite@8.0.10)
+        version: 4.1.5(jsdom@29.1.1)(vite@8.0.10)
 
 packages:
 
@@ -356,11 +356,11 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@tanstack/query-core@5.100.1':
-    resolution: {integrity: sha512-awvQhOO/2TrSCHE5LKKsXcvvj6WSBncwEcMFCB/ez0Qs0b17iyyivoGArNV3HFfXryZwCpnb/olsaBBKrIbtSw==}
+  '@tanstack/query-core@5.100.7':
+    resolution: {integrity: sha512-5R7i6ENJLhVeeJrrUz7jKBXUXv/BJrxf9FQJSkR13bPrb3zOcE8A0Z0PxYCcsKPOsiIlTibrBL/zZbtUO1TFyQ==}
 
-  '@tanstack/solid-query@5.100.1':
-    resolution: {integrity: sha512-vo4nYSasaCHGTTgXSa6rnxZUWM88VbDK2PFnHNMR9gi2BhVOmzWuUcOc+t9ODzUR9Emv/hGmMOSG6m3au4XlDg==}
+  '@tanstack/solid-query@5.100.7':
+    resolution: {integrity: sha512-xoUwMH21RZvB3MbAIXEkn1lzxjTyMXx3XQhpVdGlOfjkS7YLjXrPNx1uKLG3yE9lu2ZxWiLK/a3muD1vEokwUQ==}
     peerDependencies:
       solid-js: ^1.6.0
 
@@ -431,8 +431,8 @@ packages:
   '@vitest/utils@4.1.5':
     resolution: {integrity: sha512-76wdkrmfXfqGjueGgnb45ITPyUi1ycZ4IHgC2bhPDUfWHklY/q3MdLOAB+TF1e6xfl8NxNY0ZYaPCFNWSsw3Ug==}
 
-  animejs@3.2.2:
-    resolution: {integrity: sha512-Ao95qWLpDPXXM+WrmwcKbl6uNlC5tjnowlaRYtuVDHHoygjtIPfDUoK9NthrlZsQSKjZXlmji2TrBUAVbiH0LQ==}
+  animejs@4.4.1:
+    resolution: {integrity: sha512-XimhJw4vPb6tAd6Zaoa6BaspJ8UteQMKvL7Pvrt6MW/6u2UvJs0TB/LLqR1sigaiYvpVPC3Tokr9emcCMhWFhw==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -594,8 +594,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  jsdom@29.0.2:
-    resolution: {integrity: sha512-9VnGEBosc/ZpwyOsJBCQ/3I5p7Q5ngOY14a9bf5btenAORmZfDse1ZEheMiWcJ3h81+Fv7HmJFdS0szo/waF2w==}
+  jsdom@29.1.1:
+    resolution: {integrity: sha512-ECi4Fi2f7BdJtUKTflYRTiaMxIB0O6zfR1fX0GXpUrf6flp8QIYn1UT20YQqdSOfk2dfkCwS8LAFoJDEppNK5Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -836,11 +836,11 @@ packages:
     resolution: {integrity: sha512-Bf+ILmBgretUrdJxzXM0SgXLZ3XfiaUuOj/IKQHuTXip+05Xn+uyEYdVg0kYDipTBcLrCVyUzAPz7QmArb0mmw==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@7.0.28:
-    resolution: {integrity: sha512-7W5Efjhsc3chVdFhqtaU0KtK32J37Zcr9RKtID54nG+tIpcY79CQK/veYPODxtD/LJ4Lue66jvrQzIX2Z2/pUQ==}
+  tldts-core@7.0.29:
+    resolution: {integrity: sha512-W99NuU7b1DcG3uJ3v9k9VztCH3WialNbBkBft5wCs8V8mexu0XQqaZEYb9l9RNNzK8+3EJ9PKWB0/RUtTQ/o+Q==}
 
-  tldts@7.0.28:
-    resolution: {integrity: sha512-+Zg3vWhRUv8B1maGSTFdev9mjoo8Etn2Ayfs4cnjlD3CsGkxXX4QyW3j2WJ0wdjYcYmy7Lx2RDsZMhgCWafKIw==}
+  tldts@7.0.29:
+    resolution: {integrity: sha512-JIXCerhudr/N6OWLwLF1HVsTTUo7ry6qHa5eWZEkiMuxsIiAACL55tGLfqfHfoH7QaMQUW8fngD7u7TxWexYQg==}
     hasBin: true
 
   tough-cookie@6.0.1:
@@ -1002,8 +1002,8 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.2:
+    resolution: {integrity: sha512-IynmDyxsEsb9RKzO3J9+4SxXnl2FTFSzNBaKKaMV6tsSk0rw9gYw9gs+JFCq/qk2LCZ78KDwyj+Z289TijSkUw==}
 
 snapshots:
 
@@ -1280,11 +1280,11 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@tanstack/query-core@5.100.1': {}
+  '@tanstack/query-core@5.100.7': {}
 
-  '@tanstack/solid-query@5.100.1(solid-js@1.9.12)':
+  '@tanstack/solid-query@5.100.7(solid-js@1.9.12)':
     dependencies:
-      '@tanstack/query-core': 5.100.1
+      '@tanstack/query-core': 5.100.7
       solid-js: 1.9.12
 
   '@testing-library/dom@10.4.1':
@@ -1387,7 +1387,7 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  animejs@3.2.2: {}
+  animejs@4.4.1: {}
 
   ansi-regex@5.0.1: {}
 
@@ -1508,7 +1508,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  jsdom@29.0.2:
+  jsdom@29.1.1:
     dependencies:
       '@asamuzakjp/css-color': 5.1.11
       '@asamuzakjp/dom-selector': 7.1.1
@@ -1729,15 +1729,15 @@ snapshots:
 
   tinyrainbow@3.1.0: {}
 
-  tldts-core@7.0.28: {}
+  tldts-core@7.0.29: {}
 
-  tldts@7.0.28:
+  tldts@7.0.29:
     dependencies:
-      tldts-core: 7.0.28
+      tldts-core: 7.0.29
 
   tough-cookie@6.0.1:
     dependencies:
-      tldts: 7.0.28
+      tldts: 7.0.29
 
   tr46@6.0.0:
     dependencies:
@@ -1785,7 +1785,7 @@ snapshots:
     optionalDependencies:
       vite: 8.0.10
 
-  vitest@4.1.5(jsdom@29.0.2)(vite@8.0.10):
+  vitest@4.1.5(jsdom@29.1.1)(vite@8.0.10):
     dependencies:
       '@vitest/expect': 4.1.5
       '@vitest/mocker': 4.1.5(vite@8.0.10)
@@ -1808,7 +1808,7 @@ snapshots:
       vite: 8.0.10
       why-is-node-running: 2.3.0
     optionalDependencies:
-      jsdom: 29.0.2
+      jsdom: 29.1.1
     transitivePeerDependencies:
       - msw
 
@@ -1839,4 +1839,4 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  zod@4.3.6: {}
+  zod@4.4.2: {}
