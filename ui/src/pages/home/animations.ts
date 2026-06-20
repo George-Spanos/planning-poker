@@ -1,4 +1,4 @@
-import anime from 'animejs';
+import { animate, stagger } from 'animejs';
 import { Accessor, Setter, createEffect, createSignal } from "solid-js";
 
 export function transformH1() {
@@ -10,36 +10,35 @@ export function hide(...selectors: string[]) {
   selectors.forEach(s => document.querySelectorAll(s).forEach(v => (v as any).style.opacity = 0));
 }
 export function fade(selector: string, duration = 1000) {
-  return {
-    targets: selector,
-    opacity: [0, 1],
-    easing: 'easeInOutQuad',
-    duration
-  };
+  return [
+    selector,
+    {
+      opacity: [0, 1],
+      ease: 'inOutQuad',
+      duration
+    }
+  ] as const;
 };
 function staggerEnterFromRight(selector: string, duration = 1000) {
-  anime({
-    targets: selector,
+  animate(selector, {
     opacity: [0, 1],
     translateX: [200, 0],
-    easing: 'easeInOutElastic(1,1.5)',
-    delay: anime.stagger(500),
+    ease: 'inOutElastic(1, 1.5)',
+    delay: stagger(500),
     duration
   });
 }
 function animateWord(selector: string) {
   const textNodes = document.querySelectorAll(selector);
-  const a = anime({
-    targets: textNodes,
+  animate(textNodes, {
     translateY: [-20, 0],
     opacity: [0, 1],
-    easing: 'easeInOutElastic(1, 1.5)',
-    delay: anime.stagger(100),
+    ease: 'inOutElastic(1, 1.5)',
+    delay: stagger(100),
   });
 }
 function fromTop(selector: string) {
-  anime({
-    targets: selector,
+  animate(selector, {
     opacity: 1,
   });
 }
@@ -65,8 +64,8 @@ export function registerAnimations(): [Accessor<number>, Setter<number>] {
   // tags
   createEffect((prev) => {
     if (showTags() && !prev) {
-      anime(fade('#start-here'));
-      anime(fade('.subtitle > *'));
+      animate(...fade('#start-here'));
+      animate(...fade('.subtitle > *'));
     }
     return showTags();
   });
