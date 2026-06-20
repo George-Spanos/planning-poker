@@ -24,12 +24,12 @@ import "./room.css";
 import { useRoomContext } from "./roomState";
 import { RoomSubheader } from "./subheader";
 import { SubmitBtn } from "./submitBtn";
-import anime from 'animejs';
+import { animate } from 'animejs';
 
 const Room: Component = () => {
   const [roomEl, setRoomEl] = createSignal<Element | null>(null);
   onMount(() => {
-    anime(fade('.room'));
+    animate(...fade('.room'));
   });
   const { setSpectators, setVoters, revealing, voters, handleWsMessage } = useRoomContext();
   const navigate = useNavigate();
