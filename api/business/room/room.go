@@ -22,6 +22,7 @@ const (
 
 type Room struct {
 	Id           string
+	Scale        string
 	Voters       sync.Map // username -> *user.Connection
 	Spectators   sync.Map // username -> *user.Connection
 	CurrentRound *Round
@@ -90,10 +91,11 @@ func (room *Room) IncludeUsername(username string) bool {
 	return false
 }
 
-func New() *Room {
+func New(scale string) *Room {
 	roomId := uuid.New().String()
 	room := Room{
 		Id:           roomId,
+		Scale:        scale,
 		Voters:       sync.Map{},
 		Spectators:   sync.Map{},
 		CurrentRound: nil,
@@ -239,7 +241,7 @@ func (room *Room) emitUsersAndRevealableRound() {
 	room.cancelMu.RUnlock()
 
 	connections := room.Connections()
-	event := events.UsersUpdatedEvent{Users: users, Event: events.Event{Type: events.UsersUpdated}}
+	event := events.UsersUpdatedEvent{Users: users, Event: events.Event{Type: events.UsersUpdated}, Scale: room.Scale}
 	events.Broadcast(event, connections...)
 
 	if !revealed {

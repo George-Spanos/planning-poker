@@ -1,3 +1,10 @@
+.board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
 .board {
   display: flex;
   justify-content: center;
@@ -17,3 +24,39 @@
   font-size: 1rem;
   line-height: 20px;
 }
+
+.sort-icon-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px; /* Aligns with the height of the verdict value */
+}
+
+.sort-icon-btn {
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary--gray);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.sort-icon-btn:hover {
+  background: rgba(124, 183, 176, 0.12);
+  color: var(--primary--active);
+}
+
+.sort-icon-btn.active {
+  background: var(--primary);
+  color: var(--white);
+  box-shadow: 0 2px 4px rgba(124, 183, 176, 0.2);
+}
+
+
+

@@ -1,4 +1,4 @@
-import { Accessor, JSX, batch, createContext, createSignal, useContext } from "solid-js";
+import { Accessor, JSX, batch, createContext, createSignal, useContext, createEffect } from "solid-js";
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { username } from "../../common/state";
 import { User } from "../../common/user";
@@ -13,6 +13,7 @@ import {
   isUserVoted,
   isUsersUpdated
 } from "../../common/ws-events";
+import { SCALES, getClosestScaleSymbol } from "../../common/scales";
 export const RoundStatuses = {
   NotStarted: "NotStarted",
   Started: "Started",
@@ -34,10 +35,13 @@ export const RoomContext = createContext<{
   revealable: () => boolean;
   averageScore: Accessor<number | null>;
   standardDeviation: Accessor<number | null>;
-  verdict: Accessor<number | null>;
+  verdict: Accessor<string | null>;
   roundScore: () => string | undefined;
   addPointsToVoter: (points: number) => void;
   handleWsMessage: (event: MessageEvent<unknown>) => void;
+  sortOrder: Accessor<"none" | "asc" | "desc">;
+  setSortOrder: (order: "none" | "asc" | "desc") => void;
+  scaleType: Accessor<string>;
 }>();
 export type RoomContext = typeof RoomContext;
 export function RoomProvider(props: { children: JSX.ArrayElement; }) {
@@ -50,7 +54,17 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   const revealable = () => roundStatus() === RoundStatuses.Revealable;
   const [averageScore, setAverageScore] = createSignal<number | null>(null);
   const [standardDeviation, setStandardDeviation] = createSignal<number | null>(null);
-  const [verdict, setVerdict] = createSignal<number | null>(null);
+  const [verdict, setVerdict] = createSignal<string | null>(null);
+  const [sortOrder, setSortOrder] = createSignal<"none" | "asc" | "desc">("none");
+  const [scaleType, setScaleType] = createSignal<string>("fibonacci");
+
+  createEffect(() => {
+    if (!revealed()) {
+      setSortOrder("none");
+    } else {
+      setSortOrder("asc");
+    }
+  });
 
   const roundScore = () => {
     const avg = averageScore();
@@ -75,6 +89,7 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
       console.error(e);
     }
     if (isUsersUpdated(data)) {
+      setScaleType(data.scale);
       const v = data.users
         .filter((u) => u.isVoter)
         .map((u) => ({
@@ -113,18 +128,29 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
         setRoundStatus(RoundStatuses.Revealable);
     }
     else if (isRoundRevealed(data)) {
-      const votes = Object.values(data.votes);
-      const count = votes.length;
-      const averageScore = count > 0 ? votes.reduce((a, b) => a + b, 0) / count : 0;
+      const numericVotes = Object.values(data.votes).filter((val) => val < 100);
+      const count = numericVotes.length;
+      let averageScore = 0;
+      let stdDev = 0;
+      let calculatedVerdict = "?";
 
-      const variance = count > 0 ? votes.reduce((sum, val) => sum + Math.pow(val - averageScore, 2), 0) / count : 0;
-      const stdDev = Math.sqrt(variance);
-
-      const calculatedVerdict = getClosestFibonacci(averageScore + stdDev / 2);
+      if (count > 0) {
+        averageScore = numericVotes.reduce((a, b) => a + b, 0) / count;
+        const variance = numericVotes.reduce((sum, val) => sum + Math.pow(val - averageScore, 2), 0) / count;
+        stdDev = Math.sqrt(variance);
+        calculatedVerdict = getClosestScaleSymbol(scaleType(), averageScore + stdDev / 2);
+      } else {
+        const allVotes = Object.values(data.votes);
+        if (allVotes.includes(1000)) {
+          calculatedVerdict = "☕";
+        } else {
+          calculatedVerdict = "?";
+        }
+      }
 
       batch(() => {
-        setAverageScore(averageScore);
-        setStandardDeviation(stdDev);
+        setAverageScore(count > 0 ? averageScore : 0);
+        setStandardDeviation(count > 0 ? stdDev : 0);
         setVerdict(calculatedVerdict);
         setRoundStatus(RoundStatuses.Revealed);
         setVoters(
@@ -165,6 +191,9 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
     roundScore,
     setSpectators,
     setVoters, spectators, voters,
+    sortOrder,
+    setSortOrder,
+    scaleType,
   };
   return <RoomContext.Provider value={ctx}>{props.children}</RoomContext.Provider>;
 }

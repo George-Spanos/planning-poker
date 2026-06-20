@@ -16,6 +16,7 @@ export function isPong(data: unknown): data is Pong {
 const UsersUpdated = z.object({
   type: z.literal("usersUpdated"),
   users: z.array(User),
+  scale: z.string().default("fibonacci"),
 });
 type UsersUpdated = z.infer<typeof UsersUpdated>;
 export function isUsersUpdated(data: unknown): data is UsersUpdated {

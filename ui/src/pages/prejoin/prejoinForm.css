@@ -6,16 +6,38 @@
   padding: 100px 0 0;
   gap: 52px;
   width: 360px;
-  height: 603px;
+  min-height: 603px;
+  height: auto;
+  padding-bottom: 50px;
 }
 .prejoin-form label {
   color: var(--primary--dark);
   font-size: 1.25rem;
   line-height: 25px;
 }
-.prejoin-form input {
+.prejoin-form input,
+.prejoin-form select {
+  border: none;
   border-bottom: 3px solid var(--primary);
   width: 360px;
+  background: transparent;
+  color: var(--primary--dark);
+  font-size: 1.25rem;
+  font-family: inherit;
+  outline: none;
+}
+.prejoin-form select {
+  height: 48px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.prejoin-form input:focus,
+.prejoin-form select:focus {
+  border-bottom: 3px solid var(--primary--active);
+}
+.prejoin-form select option {
+  background-color: var(--white);
+  color: var(--primary--dark);
 }
 .prejoin-form .input-wrapper {
   display: flex;

@@ -3,13 +3,14 @@ import { isSpectator } from "../../common/state";
 import { VotingCard } from "../card/votingCard";
 import "./votingCardList.css";
 import { useRoomContext } from "../../pages/room/roomState";
+import { SCALES } from "../../common/scales";
 
 export const [selectedCard, setSelectedCard] = createSignal<number | null>(
   null
 );
 
 export const VotingCardList: Component = () => {
-  const { revealed, revealing } = useRoomContext();
+  const { revealed, revealing, scaleType } = useRoomContext();
   createEffect((prev) => {
     if (prev && !revealed()) {
       setSelectedCard(null);
@@ -17,14 +18,15 @@ export const VotingCardList: Component = () => {
     return revealed();
   }, false);
   const canSelectCard = () => !isSpectator() && !revealing() && !revealed();
-  const cardValues = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 100, 1000];
+  const scale = () => SCALES[scaleType()] || SCALES.fibonacci;
   return (
     <div class="voting-card-list" data-testid="voting-card-list">
-      {cardValues.map((v) => (
+      {scale().cards.map((card) => (
         <VotingCard
-          points={v}
-          selected={selectedCard() === v}
-          action={() => (canSelectCard() ? setSelectedCard(v) : null)}
+          points={card.value}
+          label={card.label}
+          selected={selectedCard() === card.value}
+          action={() => (canSelectCard() ? setSelectedCard(card.value) : null)}
         />
       ))}
     </div>
