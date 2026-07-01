@@ -3,19 +3,18 @@ import "./card.css";
 export const VotingCard: Component<{
   selected?: boolean;
   points: number;
+  label?: string;
   action: () => void;
 }> = (_props) => {
   const props = mergeProps({ selected: false }, _props);
+  const displayLabel = () => props.label !== undefined ? props.label : (props.points === 100 ? "?" : props.points.toString());
   return (
     <button
       classList={{ "voting-card": true, selected: props.selected }}
       data-testid={`voting-card-${props.points}`}
       onClick={props.action}
     >
-      <Switch fallback={<span>{props.points}</span>}>
-        <Match when={props.points === 100}>
-          <span>?</span>
-        </Match>
+      <Switch fallback={<span>{displayLabel()}</span>}>
         <Match when={props.points === 1000}>
           <img src={`/cup-small-${props.selected ? "white" : "black"}.svg`} />
         </Match>

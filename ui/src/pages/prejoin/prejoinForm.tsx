@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "@solidjs/router";
-import { Component, createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, onCleanup, onMount, Show, For } from "solid-js";
 import {
   BrowserStorageKeys,
   isSpectator,
@@ -16,6 +16,7 @@ import "./prejoinForm.css";
 import { animate }  from 'animejs';
 import { fade } from "../home/animations";
 import { createQuery, useQueryClient } from "@tanstack/solid-query";
+import { SCALES } from "../../common/scales";
 
 const PrejoinForm: Component = () => {
   const queryClient = useQueryClient();
@@ -43,6 +44,7 @@ const PrejoinForm: Component = () => {
   const title = isCreatingRoom ? "Create a New Room" : "Joining Room";
   const buttonText = isCreatingRoom ? "create room" : "join room";
   const [usernameError, setUsernameError] = createSignal<string | null>(null);
+  const [selectedScale, setSelectedScale] = createSignal<string>("fibonacci");
 
   const handleInputChanged = (event: KeyboardEvent) => {
     try {
@@ -60,13 +62,12 @@ const PrejoinForm: Component = () => {
     }
   };
   async function createRoom() {
-    const createRoomUrl = apiV1Url + "/createRoom";
+    const createRoomUrl = `${apiV1Url}/createRoom?scale=${encodeURIComponent(selectedScale())}`;
     const response = await fetch(createRoomUrl, {
       method: "POST",
     });
     const roomId = await response.text();
     return roomId;
-
   }
   async function handleSubmit(e: Event) {
     e.preventDefault();
@@ -92,6 +93,23 @@ const PrejoinForm: Component = () => {
           <span class="error">{usernameError()}</span>
         </Show>
       </div>
+      <Show when={isCreatingRoom}>
+        <div class="input-wrapper">
+          <label for="scale">Agile Scale</label>
+          <select
+            data-testid="scale-select"
+            name="scale"
+            onInput={(e) => setSelectedScale(e.currentTarget.value)}
+            value={selectedScale()}
+          >
+            <For each={Object.values(SCALES)}>
+              {(scale) => (
+                <option value={scale.value}>{scale.name}</option>
+              )}
+            </For>
+          </select>
+        </div>
+      </Show>
       <div class="is-spectator">
         <div class="is-spectator-switch">
           <Toggle

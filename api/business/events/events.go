@@ -29,6 +29,7 @@ type PongEvent struct {
 type UsersUpdatedEvent struct {
 	Event
 	Users []user.User `json:"users"`
+	Scale string      `json:"scale"`
 }
 
 type UserVotedEvent struct {

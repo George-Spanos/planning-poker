@@ -126,6 +126,63 @@ func TestCreateRoom(t *testing.T) {
 	}
 }
 
+func TestCreateRoomScaleSelection(t *testing.T) {
+	t.Log("Given a user creates a room with a chosen agile scale")
+	{
+		t.Log("\tWhen a valid scale is supplied")
+		{
+			r := httptest.NewRequest(http.MethodPost, "/createRoom?scale=tshirt", nil)
+			w := httptest.NewRecorder()
+			handlers.CreateRoom(w, r)
+			res := w.Result()
+			defer res.Body.Close()
+			if res.StatusCode != http.StatusOK {
+				t.Fatalf("\t\tExpected 200. Got: %v", res.StatusCode)
+			}
+			data, _ := io.ReadAll(res.Body)
+			created, found := room.Get(string(data))
+			if !found {
+				t.Fatal("\t\tRoom should be created")
+			}
+			if created.Scale != "tshirt" {
+				t.Fatalf("\t\tRoom should store the chosen scale. Expected tshirt. Got: %v", created.Scale)
+			}
+			t.Log("\t\tThen the room stores the chosen scale")
+		}
+
+		t.Log("\tWhen no scale is supplied")
+		{
+			r := httptest.NewRequest(http.MethodPost, "/createRoom", nil)
+			w := httptest.NewRecorder()
+			handlers.CreateRoom(w, r)
+			res := w.Result()
+			defer res.Body.Close()
+			data, _ := io.ReadAll(res.Body)
+			created, found := room.Get(string(data))
+			if !found {
+				t.Fatal("\t\tRoom should be created")
+			}
+			if created.Scale != room.DefaultScale {
+				t.Fatalf("\t\tRoom should default the scale. Expected %v. Got: %v", room.DefaultScale, created.Scale)
+			}
+			t.Log("\t\tThen the room falls back to the default scale")
+		}
+
+		t.Log("\tWhen an unknown scale is supplied")
+		{
+			r := httptest.NewRequest(http.MethodPost, "/createRoom?scale=garbage", nil)
+			w := httptest.NewRecorder()
+			handlers.CreateRoom(w, r)
+			res := w.Result()
+			defer res.Body.Close()
+			if res.StatusCode != http.StatusBadRequest {
+				t.Fatalf("\t\tExpected 400 for an invalid scale. Got: %v", res.StatusCode)
+			}
+			t.Log("\t\tThen the request is rejected with 400")
+		}
+	}
+}
+
 func TestConnectVoter(t *testing.T) {
 	t.Log("Given a user lands on the platform via a link")
 	data := CreateRoomAndGetId(t)
