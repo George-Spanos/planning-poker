@@ -26,7 +26,10 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	scale := r.URL.Query().Get("scale")
 	if scale == "" {
-		scale = "fibonacci"
+		scale = room.DefaultScale
+	} else if !room.IsValidScale(scale) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	room := room.New(scale)
 	w.Write([]byte(room.Id))

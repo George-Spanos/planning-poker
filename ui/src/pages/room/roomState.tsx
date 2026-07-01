@@ -1,7 +1,7 @@
 import { Accessor, JSX, batch, createContext, createSignal, useContext, createEffect } from "solid-js";
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { username } from "../../common/state";
-import { User } from "../../common/user";
+import { SortOrder, User } from "../../common/user";
 import {
   RoundToReveal,
   isCancelReveal,
@@ -13,7 +13,7 @@ import {
   isUserVoted,
   isUsersUpdated
 } from "../../common/ws-events";
-import { SCALES, getClosestScaleSymbol } from "../../common/scales";
+import { getClosestScaleSymbol } from "../../common/scales";
 export const RoundStatuses = {
   NotStarted: "NotStarted",
   Started: "Started",
@@ -39,8 +39,8 @@ export const RoomContext = createContext<{
   roundScore: () => string | undefined;
   addPointsToVoter: (points: number) => void;
   handleWsMessage: (event: MessageEvent<unknown>) => void;
-  sortOrder: Accessor<"none" | "asc" | "desc">;
-  setSortOrder: (order: "none" | "asc" | "desc") => void;
+  sortOrder: Accessor<SortOrder>;
+  setSortOrder: (order: SortOrder) => void;
   scaleType: Accessor<string>;
 }>();
 export type RoomContext = typeof RoomContext;
@@ -55,7 +55,7 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   const [averageScore, setAverageScore] = createSignal<number | null>(null);
   const [standardDeviation, setStandardDeviation] = createSignal<number | null>(null);
   const [verdict, setVerdict] = createSignal<string | null>(null);
-  const [sortOrder, setSortOrder] = createSignal<"none" | "asc" | "desc">("none");
+  const [sortOrder, setSortOrder] = createSignal<SortOrder>("none");
   const [scaleType, setScaleType] = createSignal<string>("fibonacci");
 
   createEffect(() => {
@@ -197,18 +197,6 @@ export function RoomProvider(props: { children: JSX.ArrayElement; }) {
   };
   return <RoomContext.Provider value={ctx}>{props.children}</RoomContext.Provider>;
 }
-
-function getClosestFibonacci(num: number): number {
-  if (num <= 0) return 0;
-  let a = 0;
-  let b = 1;
-  while (b < num) {
-    const temp = b;
-    b = a + b;
-    a = temp;
-  }
-  return (num - a < b - num) ? a : b;
-};
 
 export function useRoomContext() {
   const ctx = useContext(RoomContext);

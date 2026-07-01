@@ -18,7 +18,21 @@ import (
 const (
 	pongWait       = 5 * time.Minute
 	maxMessageSize = 512
+	DefaultScale   = "fibonacci"
 )
+
+// validScales is the set of scale identifiers the UI knows how to render.
+var validScales = map[string]bool{
+	"fibonacci": true,
+	"tshirt":    true,
+	"powersof2": true,
+	"animals":   true,
+}
+
+// IsValidScale reports whether scale is a known scale identifier.
+func IsValidScale(scale string) bool {
+	return validScales[scale]
+}
 
 type Room struct {
 	Id           string
