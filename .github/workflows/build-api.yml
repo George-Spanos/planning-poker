@@ -15,7 +15,7 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Test api
         working-directory: ./api
         run: make test
@@ -24,7 +24,7 @@ jobs:
     needs: test
     environment: prod
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
