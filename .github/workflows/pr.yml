@@ -8,14 +8,14 @@ jobs:
   test-api:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Test api
         working-directory: api
         run: make test
   test-ui:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Test ui
         run: |
           docker compose -f docker-compose.test.yml build
