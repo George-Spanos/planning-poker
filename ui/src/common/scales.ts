@@ -75,7 +75,7 @@ export const SCALES: Record<string, ScaleDefinition> = {
       { label: "🐑", value: 5, description: "Sheep" },
       { label: "🐮", value: 8, description: "Cow" },
       { label: "🐘", value: 13, description: "Elephant" },
-      { label: "?", value: 100, description: "Unsure" },
+      { label: "❓", value: 100, description: "Unsure" },
       { label: "☕", value: 1000, description: "Coffee break" },
     ],
   },

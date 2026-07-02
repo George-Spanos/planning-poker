@@ -36,6 +36,13 @@ export const Card: Component<{
     return undefined;
   };
 
+  const isEmojiScale = () => {
+    if (roomCtx && typeof roomCtx.scaleType === "function") {
+      return roomCtx.scaleType() === "animals";
+    }
+    return false;
+  };
+
   return (
     <div
       classList={{ card: true, voted: props.voted, revealed: props.revealed }}
@@ -44,7 +51,7 @@ export const Card: Component<{
     >
       <Show when={isNumber(props.points)}>
         <Switch fallback={<span>{displayLabel()}</span>}>
-          <Match when={props.points === 1000}>
+          <Match when={props.points === 1000 && !isEmojiScale()}>
             <img src="/cup-medium.svg" />
           </Match>
         </Switch>

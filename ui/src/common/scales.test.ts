@@ -21,8 +21,12 @@ describe("SCALES definitions", () => {
   it("gives every scale the shared ? and coffee special cards", () => {
     for (const scale of Object.values(SCALES)) {
       const specials = scale.cards.filter((c) => c.value >= 100);
-      expect(specials.map((c) => c.label)).toEqual(["?", "☕"]);
       expect(specials.map((c) => c.value)).toEqual([100, 1000]);
+      if (scale.value === "animals") {
+        expect(specials.map((c) => c.label)).toEqual(["❓", "☕"]);
+      } else {
+        expect(specials.map((c) => c.label)).toEqual(["?", "☕"]);
+      }
     }
   });
 });

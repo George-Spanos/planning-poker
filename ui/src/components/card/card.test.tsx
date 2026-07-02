@@ -31,9 +31,14 @@ describe("Card labels per scale", () => {
     expect(renderCard({ points: 100 }, "tshirt").container.textContent).toContain("?");
   });
 
-  it("renders the coffee break card as an image", () => {
+  it("renders the coffee break card as an image for non-emoji scales", () => {
     const { container } = renderCard({ points: 1000 }, "tshirt");
     expect(container.querySelector("img")?.getAttribute("src")).toBe("/cup-medium.svg");
+  });
+
+  it("renders the coffee break card as an emoji for emoji scales", () => {
+    const { container } = renderCard({ points: 1000 }, "animals");
+    expect(container.textContent).toContain("☕");
   });
 
   it("falls back to raw points when there is no room context", () => {
