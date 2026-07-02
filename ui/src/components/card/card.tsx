@@ -26,9 +26,21 @@ export const Card: Component<{
     return props.points === 100 ? "?" : props.points.toString();
   };
 
+  const displayDescription = () => {
+    if (props.points === undefined) return undefined;
+    if (roomCtx && typeof roomCtx.scaleType === "function") {
+      const scale = SCALES[roomCtx.scaleType()] || SCALES.fibonacci;
+      const card = scale.cards.find(c => c.value === props.points);
+      if (card) return card.description;
+    }
+    return undefined;
+  };
+
   return (
     <div
       classList={{ card: true, voted: props.voted, revealed: props.revealed }}
+      title={displayDescription()}
+      aria-label={displayDescription() || displayLabel()}
     >
       <Show when={isNumber(props.points)}>
         <Switch fallback={<span>{displayLabel()}</span>}>

@@ -4,6 +4,7 @@ export const VotingCard: Component<{
   selected?: boolean;
   points: number;
   label?: string;
+  description?: string;
   action: () => void;
 }> = (_props) => {
   const props = mergeProps({ selected: false }, _props);
@@ -13,6 +14,8 @@ export const VotingCard: Component<{
       classList={{ "voting-card": true, selected: props.selected }}
       data-testid={`voting-card-${props.points}`}
       onClick={props.action}
+      title={props.description}
+      aria-label={props.description || props.label}
     >
       <Switch fallback={<span>{displayLabel()}</span>}>
         <Match when={props.points === 1000}>
