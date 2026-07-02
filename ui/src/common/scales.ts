@@ -1,6 +1,7 @@
 export interface CardOption {
   label: string;
   value: number;
+  description?: string;
 }
 
 export interface ScaleDefinition {
@@ -68,14 +69,14 @@ export const SCALES: Record<string, ScaleDefinition> = {
     value: "animals",
     numeric: false,
     cards: [
-      { label: "Mouse", value: 1 },
-      { label: "Cat", value: 2 },
-      { label: "Dog", value: 3 },
-      { label: "Sheep", value: 5 },
-      { label: "Cow", value: 8 },
-      { label: "Elephant", value: 13 },
-      { label: "?", value: 100 },
-      { label: "☕", value: 1000 },
+      { label: "🐭", value: 1, description: "Mouse" },
+      { label: "🐱", value: 2, description: "Cat" },
+      { label: "🐶", value: 3, description: "Dog" },
+      { label: "🐑", value: 5, description: "Sheep" },
+      { label: "🐮", value: 8, description: "Cow" },
+      { label: "🐘", value: 13, description: "Elephant" },
+      { label: "❓", value: 100, description: "Unsure" },
+      { label: "☕", value: 1000, description: "Coffee break" },
     ],
   },
 };

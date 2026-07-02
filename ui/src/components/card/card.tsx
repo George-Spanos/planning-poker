@@ -26,13 +26,32 @@ export const Card: Component<{
     return props.points === 100 ? "?" : props.points.toString();
   };
 
+  const displayDescription = () => {
+    if (props.points === undefined) return undefined;
+    if (roomCtx && typeof roomCtx.scaleType === "function") {
+      const scale = SCALES[roomCtx.scaleType()] || SCALES.fibonacci;
+      const card = scale.cards.find(c => c.value === props.points);
+      if (card) return card.description;
+    }
+    return undefined;
+  };
+
+  const isEmojiScale = () => {
+    if (roomCtx && typeof roomCtx.scaleType === "function") {
+      return roomCtx.scaleType() === "animals";
+    }
+    return false;
+  };
+
   return (
     <div
       classList={{ card: true, voted: props.voted, revealed: props.revealed }}
+      title={displayDescription()}
+      aria-label={displayDescription() || displayLabel()}
     >
       <Show when={isNumber(props.points)}>
         <Switch fallback={<span>{displayLabel()}</span>}>
-          <Match when={props.points === 1000}>
+          <Match when={props.points === 1000 && !isEmojiScale()}>
             <img src="/cup-medium.svg" />
           </Match>
         </Switch>

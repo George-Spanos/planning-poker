@@ -25,6 +25,8 @@ export const VotingCardList: Component = () => {
         <VotingCard
           points={card.value}
           label={card.label}
+          description={card.description}
+          scaleType={scaleType()}
           selected={selectedCard() === card.value}
           action={() => (canSelectCard() ? setSelectedCard(card.value) : null)}
         />
