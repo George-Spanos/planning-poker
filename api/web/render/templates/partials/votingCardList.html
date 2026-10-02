@@ -3,15 +3,21 @@
   created with, so the server stays the single source of truth for the cards.
 
   Each card also carries its label, which lets the board resolve a revealed
-  vote (a number on the wire) back to what the voter actually saw.
+  vote (a number on the wire) back to what the voter actually saw. Cards drawn
+  as an emoji carry the word behind the glyph as well, which becomes the
+  tooltip and the accessible name.
+
+  data-emoji tells the client to keep drawing the break card as a glyph instead
+  of the shared cup artwork.
 
   Takes a scales.Scale.
 */}}
 {{define "votingCardList"}}
-<div class="voting-card-list" data-testid="voting-card-list">
+<div class="voting-card-list" data-testid="voting-card-list" data-emoji="{{.Emoji}}">
   {{range .Cards}}
-  <button class="voting-card" data-testid="voting-card-{{.Value}}" data-value="{{.Value}}" data-label="{{.Label}}">
-    {{if eq .Value 1000}}
+  <button class="voting-card" data-testid="voting-card-{{.Value}}" data-value="{{.Value}}" data-label="{{.Label}}"
+    {{if .Description}}data-description="{{.Description}}" title="{{.Description}}" aria-label="{{.Description}}"{{end}}>
+    {{if and (eq .Value 1000) (not $.Emoji)}}
     <img src="/static/assets/cup-small-black.svg" alt="{{.Label}}" />
     {{else}}
     <span>{{.Label}}</span>

@@ -48,19 +48,55 @@ func TestNumericFlags(t *testing.T) {
 }
 
 // Every scale must offer the two escape hatches, as the last two cards, so the
-// voting card list always ends the same way.
+// voting card list always ends the same way. Only the glyph differs: the
+// animals scale is drawn entirely as emoji.
 func TestEveryScaleEndsWithTheSpecialCards(t *testing.T) {
+	want := map[string][2]string{
+		"fibonacci": {"?", "☕"},
+		"tshirt":    {"?", "☕"},
+		"powersof2": {"?", "☕"},
+		"animals":   {"❓", "☕"},
+	}
 	for _, scale := range scales.All() {
 		cards := scale.Cards
 		if len(cards) < 2 {
 			t.Fatalf("scale %q has %d cards", scale.Value, len(cards))
 		}
 		unknown, coffee := cards[len(cards)-2], cards[len(cards)-1]
-		if unknown.Label != "?" || unknown.Value != scales.Unknown {
-			t.Errorf("scale %q: second to last card = %+v, want {? %d}", scale.Value, unknown, scales.Unknown)
+		if unknown.Label != want[scale.Value][0] || unknown.Value != scales.Unknown {
+			t.Errorf("scale %q: second to last card = %+v, want {%s %d}", scale.Value, unknown, want[scale.Value][0], scales.Unknown)
 		}
-		if coffee.Label != "☕" || coffee.Value != scales.Coffee {
-			t.Errorf("scale %q: last card = %+v, want {☕ %d}", scale.Value, coffee, scales.Coffee)
+		if coffee.Label != want[scale.Value][1] || coffee.Value != scales.Coffee {
+			t.Errorf("scale %q: last card = %+v, want {%s %d}", scale.Value, coffee, want[scale.Value][1], scales.Coffee)
+		}
+	}
+}
+
+// The animals scale is drawn as emoji: its card words ("Elephant") are too long
+// for a voting card. Every glyph therefore keeps its word in Description, which
+// is what the tooltip and the accessible name show.
+func TestEmojiScaleSpellsItsCardsOutInWords(t *testing.T) {
+	for _, scale := range scales.All() {
+		wantEmoji := scale.Value == "animals"
+		if scale.Emoji != wantEmoji {
+			t.Errorf("Get(%q).Emoji = %v, want %v", scale.Value, scale.Emoji, wantEmoji)
+		}
+	}
+
+	scale := scales.Get("animals")
+	want := map[int]string{
+		1: "Mouse", 2: "Cat", 3: "Dog", 5: "Sheep", 8: "Cow", 13: "Elephant",
+		scales.Unknown: "Unsure", scales.Coffee: "Coffee break",
+	}
+	if len(scale.Cards) != len(want) {
+		t.Fatalf("animals has %d cards, want %d", len(scale.Cards), len(want))
+	}
+	for _, card := range scale.Cards {
+		if card.Description != want[card.Value] {
+			t.Errorf("animals card %d description = %q, want %q", card.Value, card.Description, want[card.Value])
+		}
+		if card.Label == card.Description {
+			t.Errorf("animals card %d should be drawn as a glyph, not its word", card.Value)
 		}
 	}
 }
@@ -98,7 +134,7 @@ func TestLabel(t *testing.T) {
 		{"fibonacci", scales.Coffee, "☕"},
 		{"tshirt", 3, "M"},
 		{"tshirt", 13, "XXL"},
-		{"animals", 8, "Cow"},
+		{"animals", 8, "🐮"},
 		{"powersof2", 64, "64"},
 		{"fibonacci", 7, ""}, // not a card on this scale
 	}
@@ -122,7 +158,7 @@ func TestClosestLabel(t *testing.T) {
 		{"fibonacci", 1000, "89"}, // clamps to the largest estimable card
 		{"tshirt", 10.5, "XL"},
 		{"tshirt", 1, "XS"},
-		{"animals", 12, "Elephant"},
+		{"animals", 12, "🐘"},
 		{"powersof2", 3, "2"}, // ties break towards the first card met
 		{"powersof2", 48, "32"},
 	}
@@ -137,9 +173,10 @@ func TestClosestLabel(t *testing.T) {
 // when the target sits right on top of them.
 func TestClosestLabelNeverReturnsASpecialCard(t *testing.T) {
 	for _, scale := range scales.All() {
+		unknown, coffee := scale.Label(scales.Unknown), scale.Label(scales.Coffee)
 		for _, target := range []float64{float64(scales.Unknown), float64(scales.Coffee), 5000} {
 			got := scale.ClosestLabel(target)
-			if got == "?" || got == "☕" {
+			if got == unknown || got == coffee {
 				t.Errorf("Get(%q).ClosestLabel(%v) = %q, want an estimable card", scale.Value, target, got)
 			}
 		}

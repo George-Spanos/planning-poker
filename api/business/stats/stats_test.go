@@ -58,7 +58,13 @@ func TestCompute(t *testing.T) {
 			name:  "animals",
 			scale: "animals",
 			votes: map[string]int{"a": 1, "b": 2}, // Mouse, Cat
-			want:  stats.Stats{Numeric: false, Average: "1.5", StandardDeviation: "0.5", Verdict: "Cat"},
+			want:  stats.Stats{Numeric: false, Average: "1.5", StandardDeviation: "0.5", Verdict: "🐱"},
+		},
+		{
+			name:  "nobody knew, on an emoji drawn scale",
+			scale: "animals",
+			votes: map[string]int{"a": scales.Unknown, "b": scales.Unknown},
+			want:  stats.Stats{Numeric: false, Average: "0.0", StandardDeviation: "0.0", Verdict: "❓"},
 		},
 		{
 			name:  "everyone asked for a break",

@@ -2,7 +2,7 @@ import * as board from "./board.js";
 import * as header from "./roomHeader.js";
 import * as submitButton from "./submitButton.js";
 import * as toast from "./toast.js";
-import { labels } from "./scale.js";
+import { cards } from "./scale.js";
 import { navigate } from "./router.js";
 import { getUsername, isSpectator, role, setSpectator } from "./state.js";
 
@@ -45,7 +45,7 @@ export function initRoom() {
     /** Revealed points, kept by username so they survive a voter list update. */
     points: new Map(),
     selectedCard: null,
-    labels: labels(),
+    cards: cards(),
   };
 
   let socket = null;
@@ -150,7 +150,7 @@ export function initRoom() {
       }));
     state.spectators = event.users.filter((user) => !user.isVoter);
 
-    board.renderVoters(orderedVoters(), { revealed, labels: state.labels });
+    board.renderVoters(orderedVoters(), { revealed, cards: state.cards });
     renderSpectators();
     renderSubmitButton();
   }
@@ -164,7 +164,7 @@ export function initRoom() {
       points: state.points.get(voter.username),
     }));
 
-    board.revealVotes(event.votes, state.labels);
+    board.revealVotes(event.votes, state.cards);
 
     state.stats = event.stats;
     // Sorting on reveal groups the agreements together, which is where the

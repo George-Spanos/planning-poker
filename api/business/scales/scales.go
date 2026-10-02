@@ -14,10 +14,13 @@ const (
 const Default = "fibonacci"
 
 // Card is a single option a voter can pick. Value is what travels over the
-// wire; Label is what the user sees.
+// wire; Label is what the user sees. Description spells the label out in words
+// for cards drawn as an emoji, where the glyph alone is not a name a tooltip or
+// a screen reader can use; it is empty when the label already reads as text.
 type Card struct {
-	Label string `json:"label"`
-	Value int    `json:"value"`
+	Label       string `json:"label"`
+	Value       int    `json:"value"`
+	Description string `json:"description,omitempty"`
 }
 
 // Scale is one named set of cards. Numeric scales show an average and a
@@ -27,7 +30,10 @@ type Scale struct {
 	Name    string `json:"name"`
 	Value   string `json:"value"`
 	Numeric bool   `json:"numeric"`
-	Cards   []Card `json:"cards"`
+	// Emoji marks a scale drawn entirely as emoji. Its break card shows the
+	// coffee glyph rather than the cup artwork the other scales share.
+	Emoji bool   `json:"emoji"`
+	Cards []Card `json:"cards"`
 }
 
 // Order is the display order of the scales in the create-room form.
@@ -90,15 +96,18 @@ var scales = map[string]Scale{
 		Name:    "Animals",
 		Value:   "animals",
 		Numeric: false,
+		Emoji:   true,
+		// Drawn as emoji: the animal names are too long to fit a voting card,
+		// so the word moves to Description and becomes the tooltip.
 		Cards: []Card{
-			{Label: "Mouse", Value: 1},
-			{Label: "Cat", Value: 2},
-			{Label: "Dog", Value: 3},
-			{Label: "Sheep", Value: 5},
-			{Label: "Cow", Value: 8},
-			{Label: "Elephant", Value: 13},
-			{Label: "?", Value: Unknown},
-			{Label: "☕", Value: Coffee},
+			{Label: "🐭", Value: 1, Description: "Mouse"},
+			{Label: "🐱", Value: 2, Description: "Cat"},
+			{Label: "🐶", Value: 3, Description: "Dog"},
+			{Label: "🐑", Value: 5, Description: "Sheep"},
+			{Label: "🐮", Value: 8, Description: "Cow"},
+			{Label: "🐘", Value: 13, Description: "Elephant"},
+			{Label: "❓", Value: Unknown, Description: "Unsure"},
+			{Label: "☕", Value: Coffee, Description: "Coffee break"},
 		},
 	},
 }

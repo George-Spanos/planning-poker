@@ -100,6 +100,49 @@ func TestRoomRendersTheCardsOfItsOwnScale(t *testing.T) {
 	}
 }
 
+// The animals scale is drawn as emoji, so the words behind the glyphs have to
+// reach the page: they are the tooltip and the accessible name of each card.
+func TestEmojiRoomDrawsTheWordsBehindTheGlyphs(t *testing.T) {
+	body := renderPage(t, "room", struct {
+		RoomId string
+		Scale  scales.Scale
+	}{RoomId: "a-room", Scale: scales.Get("animals")})
+
+	if !strings.Contains(body, `data-label="🐘"`) {
+		t.Error("an animals room should offer the elephant card as a glyph")
+	}
+	if !strings.Contains(body, `title="Elephant"`) {
+		t.Error("the elephant card should spell itself out in a tooltip")
+	}
+	if !strings.Contains(body, `aria-label="Elephant"`) {
+		t.Error("the elephant card should spell itself out to a screen reader")
+	}
+	if !strings.Contains(body, `data-emoji="true"`) {
+		t.Error("an animals room should tell the client its cards are emoji")
+	}
+	if strings.Contains(body, "cup-small-black.svg") {
+		t.Error("an emoji drawn room should show the break card as a glyph, not as the cup artwork")
+	}
+}
+
+// The break card is artwork everywhere else, and the client has to be told so.
+func TestNonEmojiRoomStillDrawsTheCup(t *testing.T) {
+	body := renderPage(t, "room", struct {
+		RoomId string
+		Scale  scales.Scale
+	}{RoomId: "a-room", Scale: scales.Get("fibonacci")})
+
+	if !strings.Contains(body, "cup-small-black.svg") {
+		t.Error("a fibonacci room should show the break card as the cup artwork")
+	}
+	if !strings.Contains(body, `data-emoji="false"`) {
+		t.Error("a fibonacci room should tell the client its cards are not emoji")
+	}
+	if strings.Contains(body, "data-description") {
+		t.Error("a fibonacci room has no glyphs to spell out, so no card should carry a description")
+	}
+}
+
 func TestUnknownPageIsNotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 	render.Page(w, "nope", nil)

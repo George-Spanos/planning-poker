@@ -42,10 +42,12 @@ func Compute(votes map[string]int, scale scales.Scale) Stats {
 	if len(estimates) == 0 {
 		s.Average = format(0)
 		s.StandardDeviation = format(0)
+		// The scale owns the glyphs, so the verdict matches the cards the room
+		// was looking at — "❓" and not "?" on the emoji drawn scales.
 		if coffee {
-			s.Verdict = "☕"
+			s.Verdict = scale.Label(scales.Coffee)
 		} else {
-			s.Verdict = "?"
+			s.Verdict = scale.Label(scales.Unknown)
 		}
 		return s
 	}

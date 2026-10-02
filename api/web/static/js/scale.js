@@ -9,11 +9,24 @@
 /** The break card, which is drawn rather than written. */
 export const COFFEE = 1000;
 
-/** @returns {Map<number, string>} card value to the label the voter saw */
-export function labels() {
-  const map = new Map();
+/**
+ * Everything the board needs to draw a revealed vote.
+ *
+ * @returns {{labels: Map<number, string>, descriptions: Map<number, string>, emoji: boolean}}
+ *   labels maps a card value to the label the voter saw, descriptions to the
+ *   words behind an emoji label (absent for scales that already read as text),
+ *   and emoji says whether the break card is a glyph rather than the artwork.
+ */
+export function cards() {
+  const labels = new Map();
+  const descriptions = new Map();
   document.querySelectorAll(".voting-card").forEach((card) => {
-    map.set(Number(card.dataset.value), card.dataset.label);
+    const value = Number(card.dataset.value);
+    labels.set(value, card.dataset.label);
+    if (card.dataset.description) {
+      descriptions.set(value, card.dataset.description);
+    }
   });
-  return map;
+  const list = document.querySelector(".voting-card-list");
+  return { labels, descriptions, emoji: list?.dataset.emoji === "true" };
 }

@@ -31,7 +31,7 @@ function cardOf(username) {
 }
 
 /** Replaces the board with one cell per voter, in the given order. */
-export function renderVoters(voters, { revealed, labels }) {
+export function renderVoters(voters, { revealed, cards }) {
   const el = board();
   if (!el) return;
 
@@ -46,7 +46,7 @@ export function renderVoters(voters, { revealed, labels }) {
       if (voter.voted && !revealed) card.classList.add("voted");
       if (revealed) card.classList.add("revealed");
       if (revealed && typeof voter.points === "number") {
-        fillCard(card, voter.points, labels);
+        fillCard(card, voter.points, cards);
       }
       cell.appendChild(card);
 
@@ -66,13 +66,13 @@ export function markVoted(username) {
 }
 
 /** Turns every card face up and writes the vote onto it. */
-export function revealVotes(votes, labels) {
+export function revealVotes(votes, cards) {
   for (const [username, points] of Object.entries(votes)) {
     const card = cardOf(username);
     if (!card) continue;
     card.classList.remove("voted");
     card.classList.add("revealed");
-    fillCard(card, points, labels);
+    fillCard(card, points, cards);
   }
 }
 
@@ -80,20 +80,34 @@ export function revealVotes(votes, labels) {
 export function clearVotes() {
   document.querySelectorAll(".board .card").forEach((card) => {
     card.classList.remove("voted", "revealed");
+    card.removeAttribute("title");
+    card.removeAttribute("aria-label");
     card.replaceChildren();
   });
 }
 
-function fillCard(card, points, labels) {
-  if (points === COFFEE) {
+/**
+ * Writes a revealed vote onto a card. A card drawn as an emoji carries the word
+ * behind the glyph, which is what the tooltip and the accessible name show. On
+ * the scales drawn as emoji the break card stays a glyph too, rather than the
+ * cup artwork the others share.
+ */
+function fillCard(card, points, cards) {
+  const label = cards.labels.get(points) ?? String(points);
+  const description = cards.descriptions.get(points);
+  if (description) {
+    card.title = description;
+    card.setAttribute("aria-label", description);
+  }
+  if (points === COFFEE && !cards.emoji) {
     const img = document.createElement("img");
     img.src = "/static/assets/cup-medium.svg";
-    img.alt = labels.get(points) ?? "";
+    img.alt = description ?? label;
     card.replaceChildren(img);
     return;
   }
   const span = document.createElement("span");
-  span.textContent = labels.get(points) ?? String(points);
+  span.textContent = label;
   card.replaceChildren(span);
 }
 
