@@ -4,6 +4,9 @@ services:
   # there is no second hostname to publish.
   app:
     restart: always
-    image: ghcr.io/george-spanos/planning-poker-api
+    image: ghcr.io/george-spanos/planning-poker-api:stable
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
     ports:
-      - 45001:8080
+      - "127.0.0.1:45001:8080"
+      - "[::1]:45001:8080"
